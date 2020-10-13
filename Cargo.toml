@@ -1,0 +1,7 @@
+[package]
+name = "Rmatrix"
+version = "0.1.0"
+authors = ["NJ dev"]
+edition = "2020"
+
+[dependencies]
