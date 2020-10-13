@@ -1,6 +1,7 @@
 use Vec;
 
 #[derive(Debug)]
+#[derive(PartialEq)]
 #[derive(Clone)]
 pub struct RMatrix {
     pub elem: Vec<f32>,
@@ -31,6 +32,32 @@ impl RMatrix {
         
         return Ok(RMatrix {
             elem: self.elem.iter().zip(v.elem.iter()).map(|(u, v)| u+v).collect(),
+            rows: self.rows,
+            cols: self.cols,
+        });
+    }
+
+    /**
+     * Sub operation A-B. 
+     * The first matrix is mutated and contains the summation.
+     */
+    pub fn mut_sub(&mut self, v: &RMatrix) {
+        if (self.rows, self.cols) != (v.rows, v.cols) { 
+            println!("he matrix layouts differ !") 
+        }
+        
+        for i in 0..self.rows * self.cols { 
+            self.elem[i] -= v.elem[i];
+        }
+    }
+
+    pub fn sub(self: &RMatrix, v: &RMatrix) -> Result<RMatrix, String> {
+        if (self.rows, self.cols) != (v.rows, v.cols) { 
+            return Err(String::from("The matrix layouts differ !")) 
+        }
+        
+        return Ok(RMatrix {
+            elem: self.elem.iter().zip(v.elem.iter()).map(|(u, v)| u-v).collect(),
             rows: self.rows,
             cols: self.cols,
         });
