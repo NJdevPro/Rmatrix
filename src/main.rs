@@ -101,14 +101,13 @@ fn main() {
     let det = plu.determinant(&permut);
     assert_eq!(det, -1181.0001);
     println!("det A = {:?}", det);
-
+    
+    println!("Solving AX = [1,2,3]");
     let b = Matrix{
         elem: vec![1.,2.,3.], 
         rows: 3, 
         cols: 1
     };
-
-    println!("Solving AX = [1,2,3]");
     let x = plu.solve_lup(&permut, &b).unwrap();
     assert_eq!(x, Matrix{elem: vec![-0.524132, -0.28535134, 0.20406434], 
         rows: 3, cols: 1});
