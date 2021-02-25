@@ -63,6 +63,14 @@ impl RMatrix {
         });
     }
 
+    pub fn mult_by_scalar(self: &RMatrix, r: f32) -> RMatrix {
+        return RMatrix {
+            elem: self.elem.iter().map(|x| x*r).collect(),
+            rows: self.rows,
+            cols: self.cols,
+        };
+    }
+
     /**
      * Dot product of two matrices
      */
@@ -91,8 +99,8 @@ impl RMatrix {
     pub fn swap_rows(&mut self, j: usize, k: usize) {
         let mut temp_row = vec![0.;self.cols];
         temp_row.copy_from_slice(&self.elem[j*self.cols..(j+1)*self.cols]);
-        self.elem.copy_within(k*self.cols..(k+1)*self.rows, j*self.cols);
-        self.elem[k*self.cols..].copy_from_slice(&temp_row);
+        self.elem.copy_within(k*self.cols..(k+1)*self.cols, j*self.cols);
+        self.elem[k*self.cols..(k+1)*self.cols].copy_from_slice(&temp_row);
     }
 
     pub fn transpose(&self) -> RMatrix {
@@ -148,7 +156,7 @@ impl RMatrix {
             }
 
             if imax != i {
-                //pivot p and rows of a
+                //pivot p and rows of A
                 p.swap(i, imax);
                 a.swap_rows(i, imax);
                 //count pivots starting from n (for determinant)
@@ -262,5 +270,76 @@ impl RMatrix {
         else {
             return -det;
         }
+    }
+
+    /**
+     * Compute the norm of a vector
+     */
+    pub fn norm_vector(v: &Vec<f32>) -> f32 {
+        return f32::sqrt(v.iter().map(|x| x*x).sum());
+    }
+
+    pub fn norm(v: &RMatrix) -> f32 {
+        return RMatrix::norm_vector(&v.elem);
+    }
+
+    /**
+     * Identity matrix
+     * n : size of the matrix
+     * scale: multiplicative factor (put 1. for the unit identity matrix)
+     */
+    pub fn eye(n: usize, scale: f32) -> RMatrix {
+        let mut v = vec![0.; n*n];
+        for i in 0..n {
+            v[i*n + i] = scale;
+        }
+        return RMatrix{elem: v, rows: n, cols: n};
+    }
+
+    /**
+     * Inverse iteration method for finding an eigenvalue/eigenvector pair,
+     * given an initial guess.
+     * 
+     * INPUT: y, alpha  initial guess for the eigenvector and eigenvalue
+     * INPUT: epsilon precision of the result
+     * OUTPUT: an eigenvalue/eigenvector pair that is the closest to y
+     */
+    pub fn inverse_iter(self: &RMatrix,  
+        y: &RMatrix, alpha: f32,
+        epsilon: f32) 
+        -> Result<(u32, f32, RMatrix), String> {
+        
+        let n = self.rows;
+        if n != self.cols { 
+            return Err(String::from("The matrix must be square !")) 
+        }
+        if y.rows != n || y.cols != 1 { 
+            return Err(String::from("The initial guess vector must have the dimensions (rows: n, cols: 1), where n is the size of the matrix !")) 
+        }
+
+        let mut yy = y.clone();
+        let alphaxI = RMatrix::eye(n, alpha);
+        let mut b = self.sub(&alphaxI)?;   // A - alpha*I aka "shifted of origin"
+        let (lu, permut) = b.decompose_lup(epsilon).unwrap();
+
+        let mut iter = 0;
+        let mut distance = f32::MAX;
+        let mut theta = 0.0_f32;
+
+        while distance > epsilon * f32::abs(theta) {
+            iter += 1;
+
+            let norm_y = RMatrix::norm_vector(&yy.elem);
+            let v = RMatrix{elem: yy.mult_by_scalar(1.0 / norm_y).elem, 
+                rows: n, 
+                cols: 1};
+            
+            // solve (A - sigma*I) y = v, where v = y/||y||
+            yy = lu.solve_lup(&permut, &v)?;
+            theta = v.transpose().dot(&yy)?.elem[0];
+            distance = RMatrix::norm(&yy.sub(&v.mult_by_scalar(theta))?);
+        }
+
+        return Ok((iter, alpha + 1.0/theta, yy.mult_by_scalar(1.0/theta)));
     }
 }

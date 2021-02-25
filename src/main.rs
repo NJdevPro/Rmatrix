@@ -1,7 +1,8 @@
 mod rmatrix;
 use rmatrix::RMatrix as Matrix;
+mod parser;
 
-fn main() {
+fn unit_tests(){
 
     let mut s1 = Matrix{elem: vec![1.,-2.,2.,-1.], rows: 2, cols: 2};
     let mut s2 = Matrix{elem: vec![3.,4.,-1.,2.], rows: 2, cols: 2};
@@ -68,7 +69,7 @@ fn main() {
     println!("s4' = {:?}", s4.transpose());
     println!("s5' = {:?}", s5.transpose());
 
-    // LU decomposition, inversion, solving, determinant
+    // LU decomposition, inversion, equation solving, determinant
     let mut square = Matrix{
         elem: vec![10.,-9.,18.,7.,-12., 11.,-10.,10.,3.], 
         rows: 3, 
@@ -122,4 +123,25 @@ fn main() {
         Err(e) => panic!(e)
     }
 
+    let eye_a = Matrix::eye(3, 3.14);
+    assert_eq!(eye_a, Matrix{elem: vec![3.14,0.,0., 0.,3.14,0., 0.,0.,3.14], 
+        rows: 3, cols: 3});
+
+    println!("Computing eigenvalue/eigenvector for = [[1,2,0],[-1,0,1],[1,-2,-1]]");
+    let c = Matrix{
+        elem: vec![1.,2.,0.,-1.,0.,1.,1.,-2.,-1.], 
+        rows: 3, 
+        cols: 3
+    };
+    let y = Matrix{elem: vec![1.,0.,1.], rows: 3, cols: 1 };
+    let alpha = 1.0;
+    let (iter, eigenvalue, eigenvector) = c.inverse_iter(&y, alpha, 1e-7).unwrap();
+    println!("iteration {:?}:", iter);
+    println!("eigenvector: v = {:?}", eigenvector.elem);
+    println!("eigenvalue: lambda = {:?}", eigenvalue);
+}
+
+
+fn main() {
+    unit_tests();
 }
