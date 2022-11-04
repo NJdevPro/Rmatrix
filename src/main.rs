@@ -1,6 +1,5 @@
 mod rmatrix;
 use rmatrix::RMatrix as Matrix;
-mod parser;
 
 fn unit_tests(){
 
@@ -15,7 +14,7 @@ fn unit_tests(){
             println!("s1+s2 = {:?}", s3);
             assert!(s3 == Matrix{elem: vec![4.,2.,1.,1.], rows: 2, cols: 2})
         },
-        Err(e) => panic!(e)
+        Err(e) => panic!("{}", e)
     }
 
     s1 = Matrix{elem: vec![1.,-2.,2.,-1.], rows: 2, cols: 2};
@@ -26,7 +25,7 @@ fn unit_tests(){
             println!("s1-s2 = {:?}", s3);
             assert!(s3 == Matrix{elem: vec![-2.0, -6.0, 3.0, -3.0], rows: 2, cols: 2})
         },
-        Err(e) => panic!(e)
+        Err(e) => panic!("{}", e)
     }
 
     s1 = Matrix{elem: vec![1.,-2.,2.,-1.], rows: 2, cols: 2};
@@ -52,7 +51,7 @@ fn unit_tests(){
             println!("s4.s5 = {:?}", s6);
             assert_eq!(s6, Matrix{ elem: vec![5.0, 0.0, 6.0, 2.0], rows: 2, cols: 2 });
         },
-        Err(e) => panic!(e)
+        Err(e) => panic!("{}", e)
     }
     s6 = s5.dot(&s4);
     match s6{
@@ -63,7 +62,7 @@ fn unit_tests(){
                 rows: 3, 
                 cols: 3 })
         },
-        Err(e) => panic!(e)
+        Err(e) => panic!("{}", e)
     }
 
     println!("s4' = {:?}", s4.transpose());
@@ -96,7 +95,7 @@ fn unit_tests(){
                     rows: 3, 
                     cols: 3 })
         },
-        Err(e) => panic!(e)
+        Err(e) => panic!("{}", e)
     }
 
     let det = plu.determinant(&permut);
@@ -120,7 +119,7 @@ fn unit_tests(){
                 rows: 3, cols: 1});
             println!("Verification: A.x = {:?}", square.dot(&x));
         },
-        Err(e) => panic!(e)
+        Err(e) => panic!("{}", e)
     }
 
     let eye_a = Matrix::eye(3, 3.14);

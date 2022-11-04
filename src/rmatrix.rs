@@ -318,8 +318,8 @@ impl RMatrix {
         }
 
         let mut yy = y.clone();
-        let alphaxI = RMatrix::eye(n, alpha);
-        let mut b = self.sub(&alphaxI)?;   // A - alpha*I aka "shifted of origin"
+        let alphax_i = RMatrix::eye(n, alpha);
+        let mut b = self.sub(&alphax_i)?;   // A - alpha*I aka "shifted of origin"
         let (lu, permut) = b.decompose_lup(epsilon).unwrap();
 
         let mut iter = 0;
