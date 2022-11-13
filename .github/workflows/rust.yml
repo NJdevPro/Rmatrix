@@ -19,4 +19,4 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: Run tests
-      run: run --package Rmatrix --bin Rmatrix
+      run: cargo run --package Rmatrix --bin Rmatrix
