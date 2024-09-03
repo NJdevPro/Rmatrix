@@ -1,8 +1,6 @@
 use Vec;
 
-#[derive(Debug)]
-#[derive(PartialEq)]
-#[derive(Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct RMatrix {
     pub elem: Vec<f32>,
     pub rows: usize,
@@ -94,10 +92,10 @@ impl RMatrix {
 
     /**
      * Swap two rows j and k of the matrix (mutates the matrix)
-     * (inefficient, allocates a buffer)
+     * j, k: indices of the rows to swap
+     * temp_row: temp vector with the number of columns of the matrix
      */
-    pub fn swap_rows(&mut self, j: usize, k: usize) {
-        let mut temp_row = vec![0.;self.cols];
+    pub fn swap_rows(&mut self, j: usize, k: usize, temp_row: &mut Vec<f32>) {
         temp_row.copy_from_slice(&self.elem[j*self.cols..(j+1)*self.cols]);
         self.elem.copy_within(k*self.cols..(k+1)*self.cols, j*self.cols);
         self.elem[k*self.cols..(k+1)*self.cols].copy_from_slice(&temp_row);
@@ -139,6 +137,7 @@ impl RMatrix {
         let mut p: Vec::<usize> = vec![0;n+1];
         for i in 0..n {p[i] = i};
 
+        let mut temp_row: Vec::<f32> = vec![0.0f32;self.cols];
         for i in 0..n { // for each row
             let mut max_a: f32 = 0.0f32;
             let mut imax = i;
@@ -158,7 +157,7 @@ impl RMatrix {
             if imax != i {
                 //pivot p and rows of A
                 p.swap(i, imax);
-                a.swap_rows(i, imax);
+                a.swap_rows(i, imax, &mut temp_row);
                 //count pivots starting from n (for determinant)
                 p[n] += 1;
             }
